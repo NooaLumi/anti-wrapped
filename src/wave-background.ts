@@ -221,6 +221,7 @@ export class WaveBackground {
   private _positionBuffer: WebGLBuffer | null;
   private _positionLocation: number;
   private _u: UniformLocations;
+  private _colorBuf = new Float32Array(3);
 
   constructor(gl: WebGLRenderingContext) {
     this._gl = gl;
@@ -293,9 +294,9 @@ export class WaveBackground {
     gl.uniform1f(this._u.density, density);
     gl.uniform1f(this._u.amplitude, amplitude);
     gl.uniform1f(this._u.thickness, thickness);
-    gl.uniform3fv(this._u.waveColorA, new Float32Array(waveColorA));
-    gl.uniform3fv(this._u.waveColorB, new Float32Array(waveColorB));
-    gl.uniform3fv(this._u.backgroundColor, new Float32Array(backgroundColor));
+    gl.uniform3fv(this._u.waveColorA, this._setColorBuf(waveColorA));
+    gl.uniform3fv(this._u.waveColorB, this._setColorBuf(waveColorB));
+    gl.uniform3fv(this._u.backgroundColor, this._setColorBuf(backgroundColor));
     gl.uniform1f(this._u.meander, meander);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -305,6 +306,13 @@ export class WaveBackground {
     gl.bindBuffer(gl.ARRAY_BUFFER, savedArrayBuffer);
     gl.useProgram(savedProgram);
     if (savedDepthTest) gl.enable(gl.DEPTH_TEST);
+  }
+
+  private _setColorBuf(c: [number, number, number]): Float32Array {
+    this._colorBuf[0] = c[0];
+    this._colorBuf[1] = c[1];
+    this._colorBuf[2] = c[2];
+    return this._colorBuf;
   }
 
   destroy(): void {

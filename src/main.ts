@@ -112,6 +112,7 @@ if (randomizeGradientBtn) {
     randomWaveGradient();
     syncPageThemeColors();
     syncGradientButtonColors();
+    scheduleRender();
 
     if (splashHint && !splashHint.classList.contains("is-hidden")) {
       splashHint.classList.add("is-hidden");
@@ -149,6 +150,14 @@ const imageOverlay = document.getElementById("imageOverlay") as HTMLCanvasElemen
 function downloadCanvasImage(): void {
   const filename = `anti-wrapped-${Date.now()}.png`;
 
+  // Render at full output resolution for the download.
+  const fullW = CONFIG.outputWidth;
+  const fullH = CONFIG.outputHeight;
+  applyCanvasSize(fullW, fullH);
+  resizeImageOverlay();
+  renderWave();
+  drawOverlay();
+
   const composite = document.createElement("canvas");
   composite.width = canvas.width;
   composite.height = canvas.height;
@@ -166,6 +175,9 @@ function downloadCanvasImage(): void {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+
+    // Restore display resolution.
+    scheduleRender();
   }, "image/png");
 }
 
@@ -380,18 +392,26 @@ if (clearImageBtn) {
   });
 }
 
+let overlayTimer = 0;
+
+/** Debounced overlay redraw */
+function scheduleOverlay(): void {
+  clearTimeout(overlayTimer);
+  overlayTimer = window.setTimeout(drawOverlay, 500);
+}
+
 if (titleInput) {
-  titleInput.addEventListener("input", drawOverlay);
+  titleInput.addEventListener("input", scheduleOverlay);
 }
 
 if (artistInput) {
-  artistInput.addEventListener("input", drawOverlay);
+  artistInput.addEventListener("input", scheduleOverlay);
 }
 
 if (ekphrasisInput) {
   ekphrasisInput.addEventListener("input", () => {
     updateEkphrasisCounter();
-    drawOverlay();
+    scheduleOverlay();
   });
 }
 
@@ -401,10 +421,19 @@ updateEkphrasisCounter();
 // Canvas resize
 // ---------------------------------------------------------------------------
 
-function resizeCanvas(): void {
-  const scale = Math.max(1, CONFIG.renderScale);
-  const w = Math.floor(CONFIG.outputWidth * scale);
-  const h = Math.floor(CONFIG.outputHeight * scale);
+/** Compute display canvas size based on CSS layout size × devicePixelRatio,
+ *  capped at the full output resolution. */
+function displayCanvasSize(): [number, number] {
+  const cssW = canvas.clientWidth || CONFIG.outputWidth;
+  const cssH = canvas.clientHeight || CONFIG.outputHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  return [
+    Math.min(Math.floor(cssW * dpr), CONFIG.outputWidth),
+    Math.min(Math.floor(cssH * dpr), CONFIG.outputHeight),
+  ];
+}
+
+function applyCanvasSize(w: number, h: number): void {
   if (canvas.width !== w || canvas.height !== h) {
     canvas.width = w;
     canvas.height = h;
@@ -413,13 +442,30 @@ function resizeCanvas(): void {
   gl.viewport(0, 0, w, h);
 }
 
+function resizeCanvas(): void {
+  const [w, h] = displayCanvasSize();
+  applyCanvasSize(w, h);
+}
+
 // ---------------------------------------------------------------------------
-// Render loop
+// On-demand rendering (no animation — only re-render when inputs change)
 // ---------------------------------------------------------------------------
 
-function render(): void {
+let renderPending = false;
+
+function scheduleRender(): void {
+  if (renderPending) return;
+  renderPending = true;
+  requestAnimationFrame(renderFrame);
+}
+
+function renderFrame(): void {
+  renderPending = false;
   resizeCanvas();
+  renderWave();
+}
 
+function renderWave(): void {
   wave.render({
     shape: 1 - Number(shapeSlider.value),
     irregularity: Number(irregularitySlider.value),
@@ -431,9 +477,12 @@ function render(): void {
     waveColorB: waveGradientB,
     backgroundColor: CONFIG.backgroundColor,
   });
-
-  requestAnimationFrame(render);
 }
 
-window.addEventListener("resize", resizeCanvas);
-render();
+// Re-render when sliders change.
+for (const slider of [shapeSlider, irregularitySlider, densitySlider, magnitudeSlider, meanderSlider, thicknessSlider]) {
+  if (slider) slider.addEventListener("input", scheduleRender);
+}
+
+window.addEventListener("resize", scheduleRender);
+scheduleRender();
