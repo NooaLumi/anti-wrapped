@@ -147,16 +147,18 @@ syncGradientButtonColors();
 
 const imageOverlay = document.getElementById("imageOverlay") as HTMLCanvasElement;
 
-function downloadCanvasImage(): void {
+async function downloadCanvasImage(): Promise<void> {
   const filename = `anti-wrapped-${Date.now()}.png`;
 
   // Render at full output resolution for the download.
   const fullW = CONFIG.outputWidth;
   const fullH = CONFIG.outputHeight;
-  applyCanvasSize(fullW, fullH);
+  canvas.width = fullW;
+  canvas.height = fullH;
   resizeImageOverlay();
+  gl.viewport(0, 0, fullW, fullH);
   renderWave();
-  drawOverlay();
+  await drawOverlay();
 
   const composite = document.createElement("canvas");
   composite.width = canvas.width;
@@ -230,7 +232,7 @@ function cropToSquare(file: File): Promise<string> {
   });
 }
 
-function drawOverlay(): void {
+function drawOverlay(): Promise<void> {
   imageCtx.clearRect(0, 0, imageOverlay.width, imageOverlay.height);
 
   const imageSize = imageOverlay.width * 0.6;
@@ -340,37 +342,39 @@ function drawOverlay(): void {
 
   if (!currentImage) {
     drawText();
-    return;
+    return Promise.resolve();
   }
 
-  const img = new Image();
-  img.onload = () => {
-    const radius = imageSize * 0.08;
-    imageCtx.save();
-    imageCtx.beginPath();
-    imageCtx.moveTo(imgX + radius, imgY);
-    imageCtx.lineTo(imgX + imageSize - radius, imgY);
-    imageCtx.quadraticCurveTo(imgX + imageSize, imgY, imgX + imageSize, imgY + radius);
-    imageCtx.lineTo(imgX + imageSize, imgY + imageSize - radius);
-    imageCtx.quadraticCurveTo(imgX + imageSize, imgY + imageSize, imgX + imageSize - radius, imgY + imageSize);
-    imageCtx.lineTo(imgX + radius, imgY + imageSize);
-    imageCtx.quadraticCurveTo(imgX, imgY + imageSize, imgX, imgY + imageSize - radius);
-    imageCtx.lineTo(imgX, imgY + radius);
-    imageCtx.quadraticCurveTo(imgX, imgY, imgX + radius, imgY);
-    imageCtx.closePath();
-    imageCtx.clip();
-    imageCtx.drawImage(img, imgX, imgY, imageSize, imageSize);
-    imageCtx.restore();
+  return new Promise<void>((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const radius = imageSize * 0.08;
+      imageCtx.save();
+      imageCtx.beginPath();
+      imageCtx.moveTo(imgX + radius, imgY);
+      imageCtx.lineTo(imgX + imageSize - radius, imgY);
+      imageCtx.quadraticCurveTo(imgX + imageSize, imgY, imgX + imageSize, imgY + radius);
+      imageCtx.lineTo(imgX + imageSize, imgY + imageSize - radius);
+      imageCtx.quadraticCurveTo(imgX + imageSize, imgY + imageSize, imgX + imageSize - radius, imgY + imageSize);
+      imageCtx.lineTo(imgX + radius, imgY + imageSize);
+      imageCtx.quadraticCurveTo(imgX, imgY + imageSize, imgX, imgY + imageSize - radius);
+      imageCtx.lineTo(imgX, imgY + radius);
+      imageCtx.quadraticCurveTo(imgX, imgY, imgX + radius, imgY);
+      imageCtx.closePath();
+      imageCtx.clip();
+      imageCtx.drawImage(img, imgX, imgY, imageSize, imageSize);
+      imageCtx.restore();
 
-    drawText();
-  };
-  img.src = currentImage;
+      drawText();
+      resolve();
+    };
+    img.src = currentImage!;
+  });
 }
 
 function resizeImageOverlay(): void {
   imageOverlay.width = canvas.width;
   imageOverlay.height = canvas.height;
-  drawOverlay();
 }
 
 if (imageInput) {
@@ -438,6 +442,7 @@ function applyCanvasSize(w: number, h: number): void {
     canvas.width = w;
     canvas.height = h;
     resizeImageOverlay();
+    drawOverlay();
   }
   gl.viewport(0, 0, w, h);
 }
