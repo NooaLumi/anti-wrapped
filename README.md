@@ -4,7 +4,7 @@ Share music you like the way you like it, without compromising your privacy.
 
 Create music cover art you can share online. Enter an artist, a song or album title, and an ekphrasis. Then shape the wave background, play with the colors and download the resulting 1080 x 1920 image you can share anywhere.
 
-**Live site:** <https://antiwrapped.github.io/>
+**Live site:** <https://nooalumi.github.io/anti-wrapped/>
 
 ## Features
 
