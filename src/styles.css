@@ -1,0 +1,788 @@
+/* ========================================================================
+   Anti-Wrapped — Style System
+   Mobile-first · Dark theme · Accessible
+   ======================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. Font Faces
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/Manrope-Variable.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rubik Beastly";
+  src: url("/fonts/RubikBeastly-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+   2. Design Tokens (Custom Properties)
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Dark color scheme for native UI defaults. */
+  color-scheme: dark;
+
+  /* --- Palette --- */
+  --color-bg: #0d1117;
+  --color-bg-elevated: #111827;
+  --color-surface: #161b22;
+  --color-surface-elevated: #1f2630;
+
+  --color-border: #30363d;
+  --color-border-subtle: #262c36;
+
+  --color-text: #e6edf3;
+  --color-text-muted: #9ba7b4;
+  --color-accent: #58a6ff;
+  --color-accent-glow: rgb(88 166 255 / 36%);
+  --color-accent-hover: rgb(88 166 255 / 52%);
+
+  --color-shadow: rgb(1 4 9 / 56%);
+
+  /* --- Semantic aliases --- */
+  --page-bg: var(--color-bg);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-muted);
+  --focus-ring: var(--color-accent);
+
+  /* --- Slider tokens --- */
+  --slider-track: #3a4352;
+  --slider-track-hover: #4a5568;
+  --slider-thumb: var(--color-text);
+  --slider-thumb-border: transparent;
+
+  /* --- Spacing scale --- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* --- Radius scale --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* --- Typography --- */
+  --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Rubik Beastly", "Trebuchet MS", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "JetBrains Mono",
+    Menlo, Consolas, monospace;
+
+  /* --- Transitions --- */
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+
+  /* --- Component tokens --- */
+  --canvas-border: var(--color-accent-glow);
+  --content-max-width: 420px;
+}
+
+/* ---------------------------------------------------------------------------
+   3. Reset & Base
+   --------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: var(--space-lg);
+  font-family: var(--font-body);
+  background: radial-gradient(
+    circle at top,
+    var(--color-bg-elevated),
+    var(--page-bg) 56%
+  );
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Inherit font on form elements for consistency. */
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+/* ---------------------------------------------------------------------------
+   4. Accessibility Utilities
+   --------------------------------------------------------------------------- */
+
+/* Visually hidden but accessible to screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   5. Layout
+   --------------------------------------------------------------------------- */
+
+/* Centered content column — main page wrapper. */
+.page-layout {
+  max-width: 900px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------------------------
+   6. Component: Site Header
+   --------------------------------------------------------------------------- */
+
+.site-header {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 0 var(--space-xl);
+  padding: var(--space-sm) var(--space-lg) var(--space-lg);
+  text-align: center;
+}
+
+/* Gradient display heading. */
+.site-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.8vw, 2.8rem);
+  line-height: 1.04;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: transparent;
+  background: linear-gradient(112deg, #00b8ff 0%, #a000ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 8px 18px rgb(0 0 0 / 28%);
+}
+
+.site-subtitle {
+  margin: var(--space-md) 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.018em;
+  text-transform: lowercase;
+}
+
+/* Decorative heart symbol in subtitle. */
+.accent-symbol {
+  margin-inline-start: 0.22em;
+  font-family: var(--font-mono);
+  font-size: 1.03em;
+  font-weight: 700;
+  color: #a000ff;
+}
+
+/* ---------------------------------------------------------------------------
+   7. Component: Button (generic, reusable)
+   --------------------------------------------------------------------------- */
+
+/* Pill-shaped button with 48 px min touch target (WCAG 2.5.8). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--canvas-border);
+  background: var(--color-surface-elevated);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    transform var(--transition-fast);
+}
+
+.btn:hover {
+  background: var(--color-surface);
+  border-color: var(--color-accent-hover);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* Accent icon button variant — gradient-styled square button. */
+.btn--accent {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--splash-border-outer, #4fdbe9);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--splash-border-outer, #4fdbe9) 34%, var(--color-surface-elevated)),
+    color-mix(in srgb, var(--splash-border-inner, #ff8f71) 30%, var(--color-surface))
+  );
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow:
+    0 6px 16px rgb(0 0 0 / 36%),
+    inset 0 1px 0 rgb(255 255 255 / 12%);
+  text-shadow: 0 1px 1px rgb(0 0 0 / 35%);
+  transition:
+    transform var(--transition-fast),
+    filter var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.btn--accent:hover {
+  transform: translateY(-1px) scale(1.03);
+  filter: brightness(1.08);
+  border-color: var(--splash-border-inner, #ff8f71);
+}
+
+.btn--accent:active {
+  transform: translateY(0);
+}
+
+.btn--accent:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+   8. Component: Text Input (generic, reusable)
+   --------------------------------------------------------------------------- */
+
+/* Styled text input with 44 px min touch target. */
+.input-text {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-elevated);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.input-text::placeholder {
+  color: var(--text-secondary);
+}
+
+.input-text:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   9. Component: Media Section (image upload + text inputs)
+   --------------------------------------------------------------------------- */
+
+/* Wraps all media-related controls above the canvas. */
+.media-section {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: var(--content-max-width);
+}
+
+/* Vertical stack of text inputs. */
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: var(--content-max-width);
+}
+
+/* Row of upload / clear action buttons. */
+.upload-actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Hide native file input; trigger via its paired label. */
+.upload-actions input[type="file"] {
+  display: none;
+}
+
+/* Relay focus from hidden file input to the upload label button. */
+.upload-label:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+   10. Component: Help Disclosure (expandable details/summary)
+   --------------------------------------------------------------------------- */
+
+.help-disclosure {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: rgb(17 24 39 / 72%);
+  overflow: hidden;
+}
+
+/* Clickable trigger row. */
+.help-disclosure__trigger {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--space-md);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+/* Remove default disclosure marker in WebKit. */
+.help-disclosure__trigger::-webkit-details-marker {
+  display: none;
+}
+
+/* Small circular badge icon next to summary text. */
+.icon-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Revealed body below the trigger. */
+.help-disclosure__body {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: 10px var(--space-md) var(--space-md);
+  color: var(--text-secondary);
+}
+
+.help-disclosure__intro {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+/* ---------------------------------------------------------------------------
+   11. Component: Tip Cards (writing tips inside the help panel)
+   --------------------------------------------------------------------------- */
+
+.tip-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.tip-card {
+  padding-top: 10px;
+  border-top: 1px dashed rgb(230 237 243 / 20%);
+}
+
+.tip-card:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.tip-card h3 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.tip-card p {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.38;
+}
+
+/* "Examples" subheading label. */
+.tip-card__label {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(230 237 243 / 78%);
+}
+
+/* Blockquote-style example lines. */
+.tip-card__examples {
+  margin-top: 6px;
+  padding: 6px 0 0 10px;
+  border-left: 2px solid rgb(88 166 255 / 38%);
+}
+
+.tip-card__examples p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: rgb(230 237 243 / 88%);
+}
+
+.tip-card__examples p + p {
+  margin-top: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   12. Component: Character Counter
+   --------------------------------------------------------------------------- */
+
+.char-counter {
+  margin-top: -2px;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ---------------------------------------------------------------------------
+   13. Component: Canvas Viewport
+   --------------------------------------------------------------------------- */
+
+/* Positioned wrapper for the WebGL canvas, overlay, and floating actions. */
+.canvas-viewport {
+  position: relative;
+  width: 100%;
+  max-width: var(--content-max-width);
+}
+
+/* Main WebGL canvas — 9:16 portrait aspect ratio. */
+.canvas-viewport__canvas {
+  display: block;
+  width: 100%;
+  max-width: var(--content-max-width);
+  aspect-ratio: 9 / 16;
+  height: auto;
+  border: 1px solid var(--canvas-border);
+  border-bottom: 0;
+  border-radius: var(--radius-xl);
+  background: var(--page-bg);
+  box-shadow: 0 18px 44px var(--color-shadow);
+}
+
+/* Transparent overlay canvas drawn on top of the WebGL canvas.
+   Pointer events pass through so the canvas beneath stays interactive. */
+.canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: var(--radius-xl);
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+}
+
+/* Floating action zone (top-right corner of viewport). */
+.canvas-viewport__actions {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  align-items: center;
+  z-index: 3;
+}
+
+/* ---------------------------------------------------------------------------
+   14. Component: Tooltip Bubble
+   --------------------------------------------------------------------------- */
+
+/* Speech-bubble tooltip anchored beside an element. */
+.tooltip-bubble {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 10px);
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 9px var(--space-md);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgb(17 24 39 / 92%);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 34%);
+}
+
+/* Right-pointing arrow on the bubble. */
+.tooltip-bubble::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 10px;
+  height: 10px;
+  background: rgb(17 24 39 / 92%);
+  border-top: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  transform: translate(-52%, -50%) rotate(45deg);
+}
+
+/* ---------------------------------------------------------------------------
+   15. Component: Fader Panel (horizontal slider strip)
+   --------------------------------------------------------------------------- */
+
+/* Horizontally scrollable row of vertical fader controls. */
+.fader-panel {
+  margin-top: -1.8rem;
+  width: 100%;
+  max-width: var(--content-max-width);
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  overflow-x: auto;
+  padding: var(--space-sm) var(--space-sm) var(--space-lg);
+  position: relative;
+  z-index: 2;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Individual vertical fader with emoji label and range slider. */
+.fader {
+  flex: 0 0 64px;
+  min-width: 64px;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 10px 6px var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgb(30 36 45 / 90%), rgb(22 27 34 / 94%));
+  box-shadow: inset 0 1px 0 rgb(230 237 243 / 7%);
+  touch-action: pan-x;
+  /* Slight playful rotation for personality. */
+  transform: rotate(2deg);
+}
+
+/* Staggered offset on even faders for visual interest. */
+.fader:nth-of-type(2n) {
+  margin-bottom: 0.5rem;
+}
+
+/* Emoji label at the top of each fader. */
+.fader__label {
+  user-select: none;
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 25%));
+}
+
+/* Vertical range slider inside each fader.
+   Internally horizontal, visually rotated via transform so
+   track/thumb pseudo-element dimensions stay consistent cross-browser.
+   Margin compensates for the rotated layout box: (width − height) / 2 = 70px. */
+.fader__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 180px;
+  height: 40px;
+  background: transparent;
+  transform: rotate(-90deg);
+  margin: 70px -70px;
+  accent-color: var(--focus-ring);
+}
+
+/* WebKit track. */
+.fader__slider::-webkit-slider-runnable-track {
+  width: 6px;
+  background: var(--slider-track);
+  border: 1px solid rgb(230 237 243 / 14%);
+  border-radius: var(--radius-pill);
+}
+
+/* WebKit thumb. */
+.fader__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 32px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  background: var(--slider-thumb);
+  border: 2px solid var(--slider-thumb-border);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 45%);
+  margin-top: -6px;
+}
+
+/* Firefox track. */
+.fader__slider::-moz-range-track {
+  width: 6px;
+  background: var(--slider-track);
+  border: 1px solid rgb(230 237 243 / 14%);
+  border-radius: var(--radius-pill);
+}
+
+/* Firefox thumb. */
+.fader__slider::-moz-range-thumb {
+  width: 32px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  background: var(--slider-thumb);
+  border: 2px solid var(--slider-thumb-border);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 45%);
+}
+
+.fader__slider:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   16. Component: Action Bar
+   --------------------------------------------------------------------------- */
+
+/* Centered row of primary action buttons (e.g. download). */
+.action-bar {
+  margin-top: var(--space-md);
+  width: 100%;
+  max-width: var(--content-max-width);
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------------------
+   17. Component: Site Footer
+   --------------------------------------------------------------------------- */
+
+.site-footer {
+  margin: 2rem auto 0;
+  width: 100%;
+  max-width: var(--content-max-width);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.site-footer a {
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+.site-footer a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   18. State Classes
+   --------------------------------------------------------------------------- */
+
+.is-hidden {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   19. Motion & Accessibility Preferences
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   20. Responsive: Tablet+ (≥ 640px)
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 640px) {
+  body {
+    padding: var(--space-2xl);
+  }
+
+  .site-header {
+    margin-bottom: var(--space-2xl);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   21. Responsive: Wider viewports (≥ 700px)
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 700px) {
+  /* Center faders when there's room instead of scrolling. */
+  .fader-panel {
+    justify-content: center;
+    overflow-x: visible;
+  }
+
+  .fader {
+    min-height: 256px;
+  }
+
+  .fader__slider {
+    width: 190px;
+    margin: 75px -75px;
+  }
+}

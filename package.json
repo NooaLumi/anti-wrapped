@@ -1,0 +1,25 @@
+{
+  "name": "antiwrapped",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Create expressive, shareable music cover art with generative WebGL wave backgrounds.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "music",
+    "generative-art",
+    "webgl",
+    "cover-art",
+    "ekphrasis"
+  ],
+  "author": "NooaLumi",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
+  }
+}
