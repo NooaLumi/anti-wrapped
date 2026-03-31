@@ -147,7 +147,7 @@ syncGradientButtonColors();
 const imageOverlay = document.getElementById("imageOverlay") as HTMLCanvasElement;
 
 function downloadCanvasImage(): void {
-  const filename = `wave-story-${Date.now()}.png`;
+  const filename = `anti-wrapped-${Date.now()}.png`;
 
   const composite = document.createElement("canvas");
   composite.width = canvas.width;
