@@ -316,7 +316,7 @@ function drawOverlay(): Promise<void> {
 
     // Watermark
     const watermarkText = "anti-wrapped";
-    const watermarkFontSize = Math.max(20, Math.round(imageOverlay.width * 0.028));
+    const watermarkFontSize = Math.round(imageOverlay.width * 0.028);
     const wmX = Math.round(imageOverlay.width * 0.04);
     const wmY = imageOverlay.height - Math.round(imageOverlay.height * 0.06);
     imageCtx.font = `600 ${watermarkFontSize}px sans-serif`;
